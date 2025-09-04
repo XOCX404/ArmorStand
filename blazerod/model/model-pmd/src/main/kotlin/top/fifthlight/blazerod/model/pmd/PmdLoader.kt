@@ -140,7 +140,7 @@ class PmdLoader : ModelFileLoader {
                 inputPosition += 4
             }
 
-            val copyBaseVertexSize = BASE_VERTEX_ATTRIBUTE_SIZE - 12
+            val copyBaseVertexSize = BASE_VERTEX_ATTRIBUTE_SIZE - 24
             // FORMAT: POSITION_NORMAL_UV_JOINT_WEIGHT
             for (i in 0 until vertexCount) {
                 // Read vertex data, transform xyz
@@ -150,6 +150,18 @@ class PmdLoader : ModelFileLoader {
                 outputBuffer.putFloat(outputPosition, x * -MMD_SCALE)
                 outputBuffer.putFloat(outputPosition + 4, y * MMD_SCALE)
                 outputBuffer.putFloat(outputPosition + 8, z * MMD_SCALE)
+                outputPosition += 12
+                inputPosition += 12
+
+                // Read normal data, transform x
+                val nx = buffer.getFloat(inputPosition)
+                val ny = buffer.getFloat(inputPosition + 4)
+                val nz = buffer.getFloat(inputPosition + 8)
+                outputBuffer.putFloat(outputPosition, -nx)
+                outputBuffer.putFloat(outputPosition + 4, ny)
+                outputBuffer.putFloat(outputPosition + 8, nz)
+                outputPosition += 12
+                inputPosition += 12
 
                 // POSITION_NORMAL_UV_JOINT_WEIGHT
                 outputBuffer.put(outputPosition, buffer, inputPosition, copyBaseVertexSize)
