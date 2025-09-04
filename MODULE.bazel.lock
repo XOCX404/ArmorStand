@@ -189,7 +189,7 @@
     "//repo:minecraft_jar.bzl%minecraft": {
       "general": {
         "bzlTransitiveDigest": "Mdwk9GKdFWcKIyCT5bDzoT/bFA9AZUeqfX1DlS7Xu5Y=",
-        "usagesDigest": "YP4wMS9zIpvs8eipEau+oVzsqdqo2qlU6yi4x8agnHU=",
+        "usagesDigest": "B0TytlqPtstfYivVezJZfcm/NBbaasFBN+WUEXOlYVU=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
