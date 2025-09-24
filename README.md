@@ -10,6 +10,7 @@
 目前 mod 在早期开发中，支持下列功能：
 
 - 渲染 glTF、VRM、PMX、PMD 格式的模型
+- 渲染基岩版实体模型（兼容 YSM 的无加密且未打包的模型）
 - 导入 VMD 格式的动画文件
 - 支持实例化渲染，从而提升多个模型渲染时的性能
 - 支持多人游戏（可以同步显示模型，但是不能也不会支持同步模型文件）
@@ -37,7 +38,7 @@ mod 采取同步模型哈希值的方式，因此你可以重命名模型，甚�
 
 烈焰棒是提供盔甲架底层渲染功能的基础库，支持的功能有：
 
-- glTF、VRM、PMX、PMD 模型加载
+- glTF、VRM、PMX、PMD、基岩版模型加载
 - 游戏内模型渲染
 - glTF 和 VMD 动画支持
 
@@ -83,6 +84,7 @@ model.
 Currently, the mod is in early development, and supports the following features:
 
 - Render glTF, VRM, PMX, PMD models
+- Render bedrock version entity models (compatible with unencrypted and non-zipped models of YSM)
 - Import VMD format animation files
 - Support instance rendering, improving performance when rendering multiple models
 - Support multiplayer (can synchronize model display, but won't support synchronizing model files)
@@ -119,7 +121,7 @@ As long as the model content does not change, you can see other players' models.
 
 BlazeRod is the library providing underlying render abilities for ArmorStand, and it supports:
 
-- glTF, VRM, PMX, PMD model loading
+- glTF, VRM, PMX, PMD and bedrock version model loading
 - In-game model rendering
 - glTF and VMD animation support
 
