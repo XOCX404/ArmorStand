@@ -103,7 +103,7 @@ object ModelInstanceManager {
             }
             val animations = result.animations?.map { AnimationLoader.load(scene, it) } ?: listOf()
 
-            val defaultAnimationSet = AnimationSetLoader.load(scene, defaultAnimationDir)
+            val defaultAnimationSet = AnimationSetLoader.load(scene, animations, defaultAnimationDir)
             val modelAnimation = modelPath.parent?.let { parentPath ->
                 listOf(
                     modelPath.nameWithoutExtension,
@@ -111,7 +111,7 @@ object ModelInstanceManager {
                 ).asSequence().map {
                     parentPath.resolve("$it.animations")
                 }.fold(defaultAnimationSet) { acc, path ->
-                    acc + AnimationSetLoader.load(scene, path)
+                    acc + AnimationSetLoader.load(scene, animations, path)
                 }
             } ?: defaultAnimationSet
 
