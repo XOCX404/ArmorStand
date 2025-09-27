@@ -29,7 +29,6 @@ kt_merge_library(
     ),
     resources = glob(
         include = ["resources/**"],
-        exclude = ["resources/fabric.mod.json"],
         allow_empty = True,
     ),
     resource_strip_prefix = "mod/src/fabric/resources",

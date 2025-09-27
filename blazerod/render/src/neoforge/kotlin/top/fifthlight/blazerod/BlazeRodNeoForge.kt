@@ -11,7 +11,6 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.neoforge.client.event.lifecycle.ClientStoppingEvent
 import net.neoforged.neoforge.common.NeoForge
 import org.slf4j.LoggerFactory
-import top.fifthlight.armorstand.debug.ResourceCountTrackerFrame
 import top.fifthlight.blazerod.debug.*
 import top.fifthlight.blazerod.event.RenderEvents
 import top.fifthlight.blazerod.runtime.resource.RenderTexture

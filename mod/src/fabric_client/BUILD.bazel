@@ -47,7 +47,6 @@ kt_merge_library(
         "//mod/src/main",
     ],
     resource_jars = [
-        "//blazerod:icon",
         ":fabric_mod_json",
         "//mod/src/game:access_widener",
         "//mod/src/main:main_resources",

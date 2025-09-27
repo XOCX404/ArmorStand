@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gl.RenderPassImpl
 import org.slf4j.LoggerFactory
-import top.fifthlight.armorstand.debug.ResourceCountTrackerFrame
 import top.fifthlight.blazerod.debug.*
 import top.fifthlight.blazerod.event.RenderEvents
 import top.fifthlight.blazerod.runtime.resource.RenderTexture
