@@ -1,5 +1,7 @@
 package top.fifthlight.fabazel.remapper;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 import net.fabricmc.tinyremapper.NonClassCopyMode;
 import net.fabricmc.tinyremapper.OutputConsumerPath;
 import net.fabricmc.tinyremapper.TinyRemapper;
@@ -7,13 +9,17 @@ import net.fabricmc.tinyremapper.extension.mixin.MixinExtension;
 import top.fifthlight.bazel.worker.api.WorkRequest;
 import top.fifthlight.bazel.worker.api.Worker;
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 import java.util.regex.Pattern;
 
 public class TinyRemapperWorker extends Worker implements AutoCloseable {
@@ -132,9 +138,11 @@ public class TinyRemapperWorker extends Worker implements AutoCloseable {
             var remapper = builder.build();
 
             var input = Paths.get(inputJar);
+            var outputTempFs = Jimfs.newFileSystem(Configuration.unix());
+            var outputTempRoot = outputTempFs.getPath("/");
             try {
-                var outputBuilder = new OutputConsumerPath.Builder(Paths.get(outputJar));
-                outputBuilder.assumeArchive(true);
+                var outputBuilder = new OutputConsumerPath.Builder(outputTempRoot);
+                outputBuilder.assumeArchive(false);
                 var output = outputBuilder.build();
 
                 var nonClassFilesProcessors = new ArrayList<OutputConsumerPath.ResourceRemapper>();
@@ -161,6 +169,24 @@ public class TinyRemapperWorker extends Worker implements AutoCloseable {
                 output.close();
             } finally {
                 remapper.finish();
+            }
+
+            try (var outputJarStream = new JarOutputStream(Files.newOutputStream(Paths.get(outputJar)));
+                 var outputFilePaths = Files.walk(outputTempRoot);
+                 outputTempFs) {
+                outputFilePaths
+                        .sorted()
+                        .filter(Files::isRegularFile)
+                        .forEach(path -> {
+                            var jarEntry = new JarEntry(outputTempRoot.relativize(path).toString());
+                            jarEntry.setTime(0L);
+                            try {
+                                outputJarStream.putNextEntry(jarEntry);
+                                Files.copy(path, outputJarStream);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        });
             }
 
             return 0;
