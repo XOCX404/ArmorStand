@@ -183,13 +183,13 @@ public class ActualAnnotationProcessor extends AbstractProcessor {
                 } else if (isMethod && isStatic) {
                     constructorType = ActualData.Constructor.Type.STATIC_METHOD;
                 } else {
-                    processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ActualConstructor can only be applied to a constructor or a static method");
+                    processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ActualConstructor can only be applied to a constructor or a static method for type " + type.getQualifiedName());
                     continue outer;
                 }
                 var constructorName = actualConstructorAnnotation.value();
                 if (constructorName.isEmpty()) {
                     if (isConstructor) {
-                        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ActualConstructor must have name set on constructors");
+                        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ActualConstructor must have name set on constructors for type " + type.getQualifiedName());
                         continue outer;
                     }
                     constructorName = enclosedElement.getSimpleName().toString();
@@ -203,13 +203,26 @@ public class ActualAnnotationProcessor extends AbstractProcessor {
                                 parameter.getSimpleName().toString()
                         ))
                         .toArray(ActualData.Constructor.Parameter[]::new);
-                constructors.add(new ActualData.Constructor(constructorType, constructorName, parameters));
+
+                String returnTypeName;
+                if ("<init>".equals(method.getSimpleName().toString())) {
+                    returnTypeName = Util.getInternalTypeName(elementUtils, expectElement.asType());
+                } else {
+                    var returnType = method.getReturnType();
+                    if (returnType.getKind() != TypeKind.DECLARED) {
+                        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ActualConstructor's return type must be a declared type for type " + type.getQualifiedName());
+                        continue outer;
+                    }
+                    returnTypeName = Util.getInternalTypeName(elementUtils, returnType);
+                }
+
+                constructors.add(new ActualData.Constructor(constructorType, constructorName, parameters, returnTypeName));
             }
             var actualBinaryName = Util.getInternalTypeName(elementUtils, element.asType());
 
             var expectPackage = elementUtils.getPackageOf(expectElement);
             if (expectPackage.isUnnamed()) {
-                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ExpectFactory can only be applied to member class in named package");
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ExpectFactory can only be applied to member class in named package for type " + type.getQualifiedName());
                 continue;
             }
             var expectPackageName = expectPackage.getQualifiedName().toString();
@@ -217,7 +230,7 @@ public class ActualAnnotationProcessor extends AbstractProcessor {
 
             var actualPackage = elementUtils.getPackageOf(element);
             if (actualPackage.isUnnamed()) {
-                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ActualImpl can only be applied to a named package");
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "ActualImpl can only be applied to a named package for type " + type.getQualifiedName());
                 continue;
             }
             var actualPackageName = actualPackage.getQualifiedName().toString();

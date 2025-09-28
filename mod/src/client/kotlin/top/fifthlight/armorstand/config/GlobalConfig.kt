@@ -11,10 +11,8 @@ import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import org.slf4j.LoggerFactory
 import top.fifthlight.armorstand.util.GameDirectoryGetter
-import top.fifthlight.blazerod.runtime.renderer.ComputeShaderTransformRenderer
-import top.fifthlight.blazerod.runtime.renderer.CpuTransformRenderer
-import top.fifthlight.blazerod.runtime.renderer.Renderer
-import top.fifthlight.blazerod.runtime.renderer.VertexShaderTransformRenderer
+import top.fifthlight.blazerod.api.render.Renderer
+import top.fifthlight.blazerod.api.render.RendererTypeHolderFactory
 import java.nio.file.InvalidPathException
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
@@ -37,6 +35,7 @@ data class GlobalConfig(
         private val logger = LoggerFactory.getLogger(GlobalConfig::class.java)
     }
 
+    // TODO: get from list, not hard coded
     @Serializable
     enum class RendererKey(
         val nameKey: String,
@@ -45,19 +44,19 @@ data class GlobalConfig(
         @SerialName("vertex")
         VERTEX_SHADER_TRANSFORM(
             nameKey = "armorstand.renderer.vertex_shader_transform",
-            type = VertexShaderTransformRenderer.Type,
+            type = RendererTypeHolderFactory.of().vertexShaderTransform,
         ),
 
         @SerialName("cpu")
         CPU_TRANSFORM(
             nameKey = "armorstand.renderer.cpu_transform",
-            type = CpuTransformRenderer.Type,
+            type = RendererTypeHolderFactory.of().cpuTransform,
         ),
 
         @SerialName("compute")
         COMPUTE_SHADER_TRANSFORM(
             nameKey = "armorstand.renderer.compute_shader_transform",
-            type = ComputeShaderTransformRenderer.Type,
+            type = RendererTypeHolderFactory.of().computeShaderTransform,
         ),
     }
 

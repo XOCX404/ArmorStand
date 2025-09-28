@@ -191,16 +191,16 @@ public class ExpectActualMerger {
                         // Time of ASM magic
                         var classWriter = new ClassWriter(0);
                         classWriter.visit(Opcodes.V17, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, interfaceTypeName + "Factory", null, "java/lang/Object", null);
-                        for (var constructorPair : expectConstructors.entrySet()) {
-                            var methodPair = constructorPair.getKey();
-                            var expectConstructor = constructorPair.getValue();
+                        for (var expectConstructorPair : expectConstructors.entrySet()) {
+                            var methodPair = expectConstructorPair.getKey();
+                            var expectConstructor = expectConstructorPair.getValue();
                             var actualConstructor = actualConstructors.get(methodPair);
                             if (actualConstructor == null) {
                                 throw new IllegalStateException("No actual constructor found for method pair " + methodPair);
                             }
 
-                            var methodDescriptor = "(" + methodPair.parameterTypes() + ")" + expectBinaryName;
-                            var methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, expectConstructor.name(), methodDescriptor, null, null);
+                            var generatedMethodDescriptor = "(" + methodPair.parameterTypes() + ")" + expectBinaryName;
+                            var methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, expectConstructor.name(), generatedMethodDescriptor, null, null);
                             methodVisitor.visitCode();
 
                             var actualClassName = internalNameToPath(actualData.implementationName());
@@ -237,8 +237,10 @@ public class ExpectActualMerger {
                                     var constructorDescriptor = "(" + methodPair.parameterTypes() + ")V";
                                     methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, actualClassName, "<init>", constructorDescriptor, false);
                                 }
-                                case STATIC_METHOD ->
-                                        methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, actualClassName, expectConstructor.name(), methodDescriptor, false);
+                                case STATIC_METHOD -> {
+                                    var actualMethodDescriptor = "(" + methodPair.parameterTypes() + ")" + actualConstructor.returnType();
+                                    methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, actualClassName, expectConstructor.name(), actualMethodDescriptor, false);
+                                }
                             }
                             var endLabel = new Label();
                             methodVisitor.visitLabel(endLabel);

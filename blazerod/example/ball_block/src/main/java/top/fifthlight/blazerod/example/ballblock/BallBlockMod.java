@@ -2,14 +2,16 @@ package top.fifthlight.blazerod.example.ballblock;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import top.fifthlight.blazerod.api.ModelInstance;
+import top.fifthlight.blazerod.api.ModelInstanceFactory;
+import top.fifthlight.blazerod.api.RenderScene;
+import top.fifthlight.blazerod.api.loader.ModelLoaderFactory;
+import top.fifthlight.blazerod.api.render.Renderer;
+import top.fifthlight.blazerod.api.render.RendererFactory;
 import top.fifthlight.blazerod.model.TransformId;
 import top.fifthlight.blazerod.model.formats.ModelFileLoaders;
-import top.fifthlight.blazerod.runtime.ModelInstance;
-import top.fifthlight.blazerod.runtime.RenderScene;
-import top.fifthlight.blazerod.runtime.load.ModelLoader;
-import top.fifthlight.blazerod.runtime.renderer.Renderer;
-import top.fifthlight.blazerod.runtime.renderer.VertexShaderTransformRenderer;
 
 import java.io.IOException;
 import java.net.URI;
@@ -42,7 +44,8 @@ public class BallBlockMod implements ClientModInitializer {
             try {
                 //noinspection resource
                 FileSystems.newFileSystem(uri, Map.of("create", "true"));
-            } catch (FileSystemAlreadyExistsException ignored) {} catch (IOException e) {
+            } catch (FileSystemAlreadyExistsException ignored) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -55,14 +58,15 @@ public class BallBlockMod implements ClientModInitializer {
         if (model == null) {
             throw new IllegalStateException("Ball model don't contain model");
         }
-        RENDERER = VertexShaderTransformRenderer.create();
-        ModelLoader.loadModelAsFuture(model).thenAccept(scene -> {
+        RENDERER = RendererFactory.createVertexShaderTransform();
+        var modelLoader = ModelLoaderFactory.create();
+        modelLoader.loadModelAsFuture(model).thenAccept(scene -> {
             if (scene == null) {
                 throw new IllegalStateException("Ball model load failed");
             }
             BALL_SCENE = scene;
             BALL_SCENE.increaseReferenceCount();
-            BALL_INSTANCE = new ModelInstance(BALL_SCENE);
+            BALL_INSTANCE = ModelInstanceFactory.of(BALL_SCENE);
             BALL_INSTANCE.increaseReferenceCount();
             var rootTransformNodeIndex = BALL_SCENE.getRootNode().getNodeIndex();
             // Move and scale
@@ -71,6 +75,11 @@ public class BallBlockMod implements ClientModInitializer {
                 matrix.getTranslation().add(0.5f, 0.5f, 0.5f);
             });
             BALL_INSTANCE.updateRenderData();
+        }).exceptionally(throwable -> {
+            MinecraftClient.getInstance().execute(() -> {
+                throw new RuntimeException("Failed to load model: ", throwable);
+            });
+            return null;
         });
     }
 

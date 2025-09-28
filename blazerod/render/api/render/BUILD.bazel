@@ -1,0 +1,9 @@
+load("//rule:merge_library.bzl", "kt_merge_library")
+
+kt_merge_library(
+    name = "render",
+    srcs = glob(["*.kt"]),
+    expect = True,
+    merge_deps = ["//blazerod/render/api"],
+    visibility = ["//visibility:public"],
+)

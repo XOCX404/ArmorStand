@@ -7,17 +7,17 @@ import top.fifthlight.armorstand.ArmorStand
 import top.fifthlight.armorstand.config.ConfigHolder
 import top.fifthlight.armorstand.manage.ModelManagerHolder
 import top.fifthlight.armorstand.vmc.VmcMarionetteManager
-import top.fifthlight.blazerod.animation.AnimationItem
-import top.fifthlight.blazerod.animation.AnimationItemInstance
-import top.fifthlight.blazerod.animation.AnimationLoader
-import top.fifthlight.blazerod.animation.context.BaseAnimationContext
+import top.fifthlight.blazerod.api.ModelInstance
+import top.fifthlight.blazerod.api.ModelInstanceFactory
+import top.fifthlight.blazerod.api.RenderScene
+import top.fifthlight.blazerod.api.animation.AnimationContextsFactory
+import top.fifthlight.blazerod.api.animation.AnimationItem
+import top.fifthlight.blazerod.api.animation.AnimationItemFactory
+import top.fifthlight.blazerod.api.animation.AnimationItemInstanceFactory
+import top.fifthlight.blazerod.api.loader.ModelLoaderFactory
+import top.fifthlight.blazerod.api.refcount.RefCount
 import top.fifthlight.blazerod.model.Metadata
 import top.fifthlight.blazerod.model.formats.ModelFileLoaders
-import top.fifthlight.blazerod.runtime.ModelInstance
-import top.fifthlight.blazerod.runtime.RenderScene
-import top.fifthlight.blazerod.runtime.load.ModelLoader
-import top.fifthlight.blazerod.util.RefCount
-import top.fifthlight.blazerod.util.TimeUtil
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.nameWithoutExtension
@@ -25,7 +25,7 @@ import kotlin.time.measureTimedValue
 
 object ModelInstanceManager {
     private val LOGGER = LogUtils.getLogger()
-    const val INSTANCE_EXPIRE_NS: Long = 30L * TimeUtil.NANOSECONDS_PER_SECOND
+    const val INSTANCE_EXPIRE_NS: Long = 30L * 1000000000L
     private val client = MinecraftClient.getInstance()
     private val selfUuid: UUID?
         get() = client.player?.uuid
@@ -92,7 +92,8 @@ object ModelInstanceManager {
             LOGGER.info("Model metadata: ${result.metadata}")
 
             val scene = try {
-                ModelLoader.loadModel(model) ?: run {
+                val loader = ModelLoaderFactory.create()
+                loader.loadModel(model) ?: run {
                     LOGGER.warn("Model contains no scene")
                     return@withContext ModelCache.Failed
                 }
@@ -100,7 +101,7 @@ object ModelInstanceManager {
                 LOGGER.warn("Model scene load failed", ex)
                 return@withContext ModelCache.Failed
             }
-            val animations = result.animations?.map { AnimationLoader.load(scene, it) } ?: listOf()
+            val animations = result.animations?.map { AnimationItemFactory.load(scene, it) } ?: listOf()
 
             val defaultAnimationSet = AnimationSetLoader.load(scene, animations, defaultAnimationDir)
             val modelAnimation = modelPath.parent?.let { parentPath ->
@@ -184,7 +185,7 @@ object ModelInstanceManager {
                     animations = cache.animations,
                     metadata = cache.metadata,
                     lastAccessTime = lastAccessTime,
-                    instance = ModelInstance(scene),
+                    instance = ModelInstanceFactory.of(scene),
                     controller = run {
                         val vmcRunning = VmcMarionetteManager.state.value is VmcMarionetteManager.State.Running
                         val animationSet = FullAnimationSet.from(cache.animationSet)
@@ -193,14 +194,14 @@ object ModelInstanceManager {
                             isSelf && vmcRunning -> ModelController.Vmc(scene)
 
                             animationSet != null -> ModelController.LiveSwitched(
-                                BaseAnimationContext.instance,
+                                AnimationContextsFactory.create().base(),
                                 scene,
                                 animationSet,
                             )
 
                             animation != null -> ModelController.Predefined(
-                                BaseAnimationContext.instance,
-                                AnimationItemInstance(animation),
+                                AnimationContextsFactory.create().base(),
+                                AnimationItemInstanceFactory.of(animation),
                             )
 
                             else -> ModelController.LiveUpdated(scene)

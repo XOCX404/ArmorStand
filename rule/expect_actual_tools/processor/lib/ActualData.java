@@ -18,7 +18,8 @@ public record ActualData(@JsonProperty("implementationName") String implementati
 
     public record Constructor(@JsonProperty("type") Type type,
                               @JsonProperty("name") String name,
-                              @JsonProperty("parameters") Parameter[] parameters) {
+                              @JsonProperty("parameters") Parameter[] parameters,
+                              @JsonProperty("returnType") String returnType) {
         @Override
         public String toString() {
             return "Constructor{" +

@@ -39,9 +39,4 @@ kt_merge_library(
         "@maven//:org_jetbrains_kotlin_kotlin_stdlib",
         "@minecraft//:%s_client_libraries" % game_version,
     ],
-    exports = [
-        "//blazerod/model/model-base",
-        "//blazerod/model/model-formats",
-        "//blazerod/render:render_main",
-    ],
 )

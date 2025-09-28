@@ -12,35 +12,31 @@ import top.fifthlight.armorstand.config.GlobalConfig
 import top.fifthlight.armorstand.ui.component.*
 import top.fifthlight.armorstand.ui.model.RendererSelectViewModel
 import top.fifthlight.armorstand.ui.util.checkbox
-import top.fifthlight.blazerod.runtime.renderer.ComputeShaderTransformRenderer
-import top.fifthlight.blazerod.runtime.renderer.CpuTransformRenderer
-import top.fifthlight.blazerod.runtime.renderer.Renderer
-import top.fifthlight.blazerod.runtime.renderer.VertexShaderTransformRenderer
 
 class RendererSelectScreen(parent: Screen? = null) : ArmorStandScreen<RendererSelectScreen, RendererSelectViewModel>(
     title = Text.translatable("armorstand.renderer"),
     viewModelFactory = ::RendererSelectViewModel,
     parent = parent,
 ) {
-    private val rendererData = GlobalConfig.RendererKey.entries.map { Pair(it, RendererData(it.type)) }
+    private val rendererData = GlobalConfig.RendererKey.entries.map { Pair(it, RendererData(it)) }
 
     private data class RendererData(
         val speed: Speed,
         val isShaderCompatible: Boolean,
         val isAvailable: Boolean,
     ) {
-        constructor(type: Renderer.Type<*, *>) : this(
-            speed = when (type) {
-                VertexShaderTransformRenderer.Type -> Speed.FAST
-                ComputeShaderTransformRenderer.Type -> Speed.MEDIUM
-                CpuTransformRenderer.Type -> Speed.SLOW
+        constructor(key: GlobalConfig.RendererKey) : this(
+            speed = when (key) {
+                GlobalConfig.RendererKey.VERTEX_SHADER_TRANSFORM -> Speed.FAST
+                GlobalConfig.RendererKey.COMPUTE_SHADER_TRANSFORM -> Speed.MEDIUM
+                GlobalConfig.RendererKey.CPU_TRANSFORM -> Speed.SLOW
             },
-            isShaderCompatible = when (type) {
-                VertexShaderTransformRenderer.Type -> false
-                ComputeShaderTransformRenderer.Type -> true
-                CpuTransformRenderer.Type -> true
+            isShaderCompatible = when (key) {
+                GlobalConfig.RendererKey.VERTEX_SHADER_TRANSFORM -> false
+                GlobalConfig.RendererKey.COMPUTE_SHADER_TRANSFORM -> true
+                GlobalConfig.RendererKey.CPU_TRANSFORM -> true
             },
-            isAvailable = type.isAvailable,
+            isAvailable = key.type.isAvailable,
         )
 
         enum class Speed(val nameKey: String) {

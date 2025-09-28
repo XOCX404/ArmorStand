@@ -1,7 +1,7 @@
 package top.fifthlight.armorstand.event
 
 import net.minecraft.client.gui.screen.Screen
-import top.fifthlight.blazerod.event.Event
+import top.fifthlight.blazerod.api.event.Event
 
 object ScreenEvents {
     @JvmField

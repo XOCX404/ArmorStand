@@ -31,7 +31,7 @@ public class CameraMixin {
     public void wrapGetPitch(CallbackInfoReturnable<Float> cir) {
         var transform = PlayerRenderer.getCurrentCameraTransform();
         if (transform != null) {
-            cir.setReturnValue(transform.getRotationEulerAngles().x);
+            cir.setReturnValue(transform.getRotationEulerAngles().x());
         }
     }
 
@@ -39,7 +39,7 @@ public class CameraMixin {
     public void wrapGetYaw(CallbackInfoReturnable<Float> cir) {
         var transform = PlayerRenderer.getCurrentCameraTransform();
         if (transform != null) {
-            cir.setReturnValue(transform.getRotationEulerAngles().y);
+            cir.setReturnValue(transform.getRotationEulerAngles().y());
         }
     }
 
@@ -56,10 +56,11 @@ public class CameraMixin {
         var transform = PlayerRenderer.getCurrentCameraTransform();
         if (transform != null) {
             var tickProgress = (double) this.lastTickProgress;
-            cir.setReturnValue(new Vec3d(transform.getPosition()).add(
-                    MathHelper.lerp(tickProgress, focusedEntity.lastX, focusedEntity.getX()),
-                    MathHelper.lerp(tickProgress, focusedEntity.lastY, focusedEntity.getY()),
-                    MathHelper.lerp(tickProgress, focusedEntity.lastZ, focusedEntity.getZ())
+            var position = transform.getPosition();
+            cir.setReturnValue(new Vec3d(
+                    position.x() + MathHelper.lerp(tickProgress, focusedEntity.lastX, focusedEntity.getX()),
+                    position.y() + MathHelper.lerp(tickProgress, focusedEntity.lastY, focusedEntity.getY()),
+                    position.z() + MathHelper.lerp(tickProgress, focusedEntity.lastZ, focusedEntity.getZ())
             ));
         }
     }

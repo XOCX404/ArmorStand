@@ -193,7 +193,7 @@ class AnimationScreen(parent: Screen? = null) : ArmorStandScreen<AnimationScreen
                     it.message = if (current == null) {
                         Text.translatable("armorstand.animation.no_camera")
                     } else {
-                        Text.translatable("armorstand.animation.current_camera_name", current.camera.name ?: "#$index")
+                        Text.translatable("armorstand.animation.current_camera_name", current.name ?: "#$index")
                     }
                 }
             }

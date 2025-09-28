@@ -16,7 +16,6 @@ import top.fifthlight.armorstand.manage.ModelManagerHolder
 import top.fifthlight.armorstand.manage.model.ModelItem
 import top.fifthlight.armorstand.manage.model.ModelThumbnail
 import top.fifthlight.armorstand.util.ThreadExecutorDispatcher
-import top.fifthlight.blazerod.extension.NativeImageExt
 import top.fifthlight.blazerod.model.Texture
 import top.fifthlight.blazerod.model.util.readToBuffer
 import java.nio.channels.FileChannel
@@ -120,11 +119,7 @@ class ModelIcon(
         val height: Int
         val identifier = Identifier.of("armorstand", "models/${modelItem.hash}")
         val texture = withContext(Dispatchers.Default) {
-            if (type != null) {
-                NativeImageExt.read(type, buffer)
-            } else {
-                NativeImage.read(buffer)
-            }
+            NativeImage.read(buffer)
         }.use { image ->
             width = image.width
             height = image.height

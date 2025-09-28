@@ -2,7 +2,6 @@ package top.fifthlight.armorstand.debug
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import top.fifthlight.armorstand.state.ModelInstanceManager
-import top.fifthlight.blazerod.util.TimeUtil
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
@@ -11,6 +10,9 @@ import javax.swing.*
 import javax.swing.table.DefaultTableModel
 
 class ModelManagerDebugFrame : JFrame("Model Manager Status") {
+    companion object {
+        private const val NANOSECONDS_PER_SECOND = 1000000000L
+    }
     private val itemTableItem = DefaultTableModel(
         arrayOf("UUID", "Status", "Last Access", "Time Left"), 0
     )
@@ -69,13 +71,13 @@ class ModelManagerDebugFrame : JFrame("Model Manager Status") {
             val lastAccessTime = when (item) {
                 is ModelInstanceManager.ModelInstanceItem.Model -> when(item.lastAccessTime) {
                     -1L -> "Self item"
-                    else -> "${(now - item.lastAccessTime) / TimeUtil.NANOSECONDS_PER_SECOND}s"
+                    else -> "${(now - item.lastAccessTime) / NANOSECONDS_PER_SECOND}s"
                 }
                 else -> "N/A"
             }
             val timeLeft = if (item is ModelInstanceManager.ModelInstanceItem.Model) {
                 val expireTime = now - item.lastAccessTime
-                "${(ModelInstanceManager.INSTANCE_EXPIRE_NS - expireTime) / TimeUtil.NANOSECONDS_PER_SECOND}s"
+                "${(ModelInstanceManager.INSTANCE_EXPIRE_NS - expireTime) / NANOSECONDS_PER_SECOND}s"
             } else {
                 "N/A"
             }

@@ -34,7 +34,10 @@ def _modify_deps(deps, associates, merge_deps, plugins, expect, actual):
         real_plugins += ["//rule/expect_actual_tools/processor/java:expect_processor"]
     if actual:
         real_plugins += ["//rule/expect_actual_tools/processor/java:actual_processor"]
-    return {"deps": real_deps, "associates": associates, "plugins": real_plugins}
+    args = {"deps": real_deps, "plugins": real_plugins}
+    if associates != []:
+        args["associates"] = associates
+    return args
 
 def _merge_library_macro(**kwargs):
     deps = kwargs["deps"] if "deps" in kwargs else []
@@ -78,8 +81,8 @@ def _java_merge_library_impl(ctx):
 
 java_merge_library = rule(
     parent = _java_library,
-    implementation = _merge_library_macro,
-    initializer = _java_merge_library_impl,
+    implementation = _java_merge_library_impl,
+    initializer = _merge_library_macro,
     attrs = {
         "merge_deps": attr.label_list(
             providers = [MergeLibraryInfo]

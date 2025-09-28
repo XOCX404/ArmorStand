@@ -12,9 +12,9 @@ import org.joml.Matrix4f
 import top.fifthlight.armorstand.config.ConfigHolder
 import top.fifthlight.armorstand.state.ModelInstanceManager
 import top.fifthlight.armorstand.util.RendererManager
-import top.fifthlight.blazerod.runtime.renderer.ScheduledRenderer
-import top.fifthlight.blazerod.runtime.resource.CameraTransform
-import top.fifthlight.blazerod.runtime.resource.RenderCamera
+import top.fifthlight.blazerod.api.CameraTransform
+import top.fifthlight.blazerod.api.render.ScheduledRenderer
+import top.fifthlight.blazerod.model.Camera
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -23,7 +23,7 @@ object PlayerRenderer {
 
     private var prevModelItem = WeakReference<ModelInstanceManager.ModelInstanceItem.Model?>(null)
     val selectedCameraIndex = MutableStateFlow<Int?>(null)
-    private val _totalCameras = MutableStateFlow<List<RenderCamera>?>(listOf())
+    private val _totalCameras = MutableStateFlow<List<Camera>?>(listOf())
     val totalCameras = _totalCameras.asStateFlow()
     private var cameraTransform: CameraTransform? = null
 
@@ -46,7 +46,7 @@ object PlayerRenderer {
         val instance = entry.instance
         instance.updateCamera()
 
-        return instance.modelData.cameraTransforms.getOrNull(selectedIndex).also {
+        return instance.getCameraTransform(selectedIndex).also {
             cameraTransform = it
         } ?: run {
             selectedCameraIndex.value = null

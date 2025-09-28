@@ -30,6 +30,6 @@ public class BallBlockEntityRenderer implements BlockEntityRenderer<BallBlockEnt
                 ? (RenderSystem.outputDepthTextureOverride != null ? RenderSystem.outputDepthTextureOverride : frameBuffer.getDepthAttachmentView())
                 : null;
         var renderer = BallBlockMod.getRenderer();
-        renderer.render(Objects.requireNonNull(colorFrameBuffer), depthFrameBuffer, instance.createRenderTask(matrices.peek().getPositionMatrix(), light), instance.getScene());
+        renderer.render(Objects.requireNonNull(colorFrameBuffer), depthFrameBuffer, instance.createRenderTask(matrices.peek().getPositionMatrix(), light, 0), instance.getScene());
     }
 }

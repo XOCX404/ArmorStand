@@ -11,15 +11,18 @@ import net.minecraft.util.math.MathHelper
 import top.fifthlight.armorstand.extension.internal.PlayerEntityRenderStateExtInternal
 import top.fifthlight.armorstand.util.toRadian
 import top.fifthlight.armorstand.vmc.VmcMarionetteManager
-import top.fifthlight.blazerod.animation.AnimationItemInstance
-import top.fifthlight.blazerod.animation.context.PlayerEntityAnimationContext
-import top.fifthlight.blazerod.model.*
+import top.fifthlight.blazerod.api.ModelInstance
+import top.fifthlight.blazerod.api.RenderExpression
+import top.fifthlight.blazerod.api.RenderExpressionGroup
+import top.fifthlight.blazerod.api.RenderScene
+import top.fifthlight.blazerod.api.animation.AnimationContextsFactory
+import top.fifthlight.blazerod.api.animation.AnimationItemInstance
+import top.fifthlight.blazerod.model.Expression
+import top.fifthlight.blazerod.model.HumanoidTag
+import top.fifthlight.blazerod.model.NodeTransform
+import top.fifthlight.blazerod.model.TransformId
 import top.fifthlight.blazerod.model.animation.AnimationContext
 import top.fifthlight.blazerod.model.animation.AnimationState
-import top.fifthlight.blazerod.runtime.ModelInstance
-import top.fifthlight.blazerod.runtime.RenderScene
-import top.fifthlight.blazerod.runtime.resource.RenderExpression
-import top.fifthlight.blazerod.runtime.resource.RenderExpressionGroup
 import java.util.*
 import kotlin.math.PI
 import kotlin.math.sin
@@ -189,7 +192,7 @@ sealed interface ModelController {
             uuid: UUID,
             player: AbstractClientPlayerEntity,
             renderState: PlayerEntityRenderState,
-        ) = PlayerEntityAnimationContext.with(player) { context ->
+        ) = AnimationContextsFactory.create().player(player).let { context ->
             animationState.updateTime(context)
             renderState.animationPendingValues = animationInstance.update(context, animationState)
         }
@@ -374,7 +377,7 @@ sealed interface ModelController {
             uuid: UUID,
             player: AbstractClientPlayerEntity,
             renderState: PlayerEntityRenderState,
-        ): Unit = PlayerEntityAnimationContext.with(player) { context ->
+        ): Unit = AnimationContextsFactory.create().player(player).let { context ->
             val newState = getState(player, renderState)
             if (newState != playState) {
                 this.playState = newState

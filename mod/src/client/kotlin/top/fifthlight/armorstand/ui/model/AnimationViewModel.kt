@@ -13,13 +13,13 @@ import top.fifthlight.armorstand.manage.ModelManagerHolder
 import top.fifthlight.armorstand.state.ModelController
 import top.fifthlight.armorstand.state.ModelInstanceManager
 import top.fifthlight.armorstand.ui.state.AnimationScreenState
-import top.fifthlight.blazerod.animation.AnimationItem
-import top.fifthlight.blazerod.animation.AnimationItemInstance
-import top.fifthlight.blazerod.animation.AnimationLoader
-import top.fifthlight.blazerod.animation.context.BaseAnimationContext
+import top.fifthlight.blazerod.api.ModelInstance
+import top.fifthlight.blazerod.api.animation.AnimationContextsFactory
+import top.fifthlight.blazerod.api.animation.AnimationItem
+import top.fifthlight.blazerod.api.animation.AnimationItemFactory
+import top.fifthlight.blazerod.api.animation.AnimationItemInstanceFactory
 import top.fifthlight.blazerod.model.animation.SimpleAnimationState
 import top.fifthlight.blazerod.model.formats.ModelFileLoaders
-import top.fifthlight.blazerod.runtime.ModelInstance
 import java.lang.ref.WeakReference
 
 class AnimationViewModel(scope: CoroutineScope) : ViewModel(scope) {
@@ -104,10 +104,10 @@ class AnimationViewModel(scope: CoroutineScope) : ViewModel(scope) {
             ikUpdated = false
             prevInstance = WeakReference(instance)
             _uiState.getAndUpdate {
-                it.copy(ikList = instance.scene.ikTargetComponents.mapIndexed { index, component ->
+                it.copy(ikList = instance.scene.ikTargetData.mapIndexed { index, component ->
                     Pair(
-                        instance.scene.nodes[component.effectorNodeIndex].nodeName,
-                        instance.modelData.ikEnabled[index],
+                        component.effectorNode.nodeName,
+                        instance.getIkEnabled(index),
                     )
                 })
             }
@@ -176,8 +176,8 @@ class AnimationViewModel(scope: CoroutineScope) : ViewModel(scope) {
                 val animation = instanceItem.animations[index]
                 instanceItem.instance.clearTransform()
                 instanceItem.controller = ModelController.Predefined(
-                    BaseAnimationContext.instance,
-                    AnimationItemInstance(animation),
+                    AnimationContextsFactory.create().base(),
+                    AnimationItemInstanceFactory.of(animation),
                 )
             }
 
@@ -188,11 +188,11 @@ class AnimationViewModel(scope: CoroutineScope) : ViewModel(scope) {
                         val path = ModelManagerHolder.modelDir.resolve(source.path)
                         val result = ModelFileLoaders.probeAndLoad(path)
                         val animation = result?.animations?.firstOrNull() ?: error("No animation in file")
-                        val animationItem = AnimationLoader.load(instanceItem.instance.scene, animation)
+                        val animationItem = AnimationItemFactory.load(instanceItem.instance.scene, animation)
                         instanceItem.instance.clearTransform()
                         instanceItem.controller = ModelController.Predefined(
-                            BaseAnimationContext.instance,
-                            AnimationItemInstance(animationItem),
+                            AnimationContextsFactory.create().base(),
+                            AnimationItemInstanceFactory.of(animationItem),
                         )
                     } catch (ex: Throwable) {
                         logger.warn("Failed to load animation", ex)

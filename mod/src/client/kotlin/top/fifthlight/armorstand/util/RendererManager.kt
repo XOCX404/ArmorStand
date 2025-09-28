@@ -5,7 +5,9 @@ import top.fifthlight.armorstand.ArmorStand
 import top.fifthlight.armorstand.config.ConfigHolder
 import top.fifthlight.armorstand.config.GlobalConfig
 import top.fifthlight.armorstand.state.ModelInstanceManager
-import top.fifthlight.blazerod.runtime.renderer.*
+import top.fifthlight.blazerod.api.render.Renderer
+import top.fifthlight.blazerod.api.render.RendererTypeHolderFactory
+import top.fifthlight.blazerod.api.render.ScheduledRenderer
 
 object RendererManager : AutoCloseable {
     init {
@@ -26,9 +28,9 @@ object RendererManager : AutoCloseable {
     private fun requireNotClosed() = check(!closed) { "RendererManager is closed" }
 
     private fun getConfigRendererType() = when (ConfigHolder.config.value.renderer) {
-        GlobalConfig.RendererKey.VERTEX_SHADER_TRANSFORM -> VertexShaderTransformRenderer.Type
-        GlobalConfig.RendererKey.CPU_TRANSFORM -> CpuTransformRenderer.Type
-        GlobalConfig.RendererKey.COMPUTE_SHADER_TRANSFORM -> ComputeShaderTransformRenderer.Type
+        GlobalConfig.RendererKey.VERTEX_SHADER_TRANSFORM -> RendererTypeHolderFactory.of().vertexShaderTransform
+        GlobalConfig.RendererKey.CPU_TRANSFORM -> RendererTypeHolderFactory.of().cpuTransform
+        GlobalConfig.RendererKey.COMPUTE_SHADER_TRANSFORM -> RendererTypeHolderFactory.of().computeShaderTransform
     }
 
     private var _currentRenderer: Renderer<*, *>? = null

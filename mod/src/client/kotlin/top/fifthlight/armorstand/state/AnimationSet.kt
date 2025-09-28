@@ -3,11 +3,12 @@ package top.fifthlight.armorstand.state
 import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
 import top.fifthlight.armorstand.util.ModelLoaders
-import top.fifthlight.blazerod.animation.AnimationItem
-import top.fifthlight.blazerod.animation.AnimationItemInstance
-import top.fifthlight.blazerod.animation.AnimationLoader
+import top.fifthlight.blazerod.api.RenderScene
+import top.fifthlight.blazerod.api.animation.AnimationItem
+import top.fifthlight.blazerod.api.animation.AnimationItemFactory
+import top.fifthlight.blazerod.api.animation.AnimationItemInstance
+import top.fifthlight.blazerod.api.animation.AnimationItemInstanceFactory
 import top.fifthlight.blazerod.model.formats.ModelFileLoaders
-import top.fifthlight.blazerod.runtime.RenderScene
 import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
@@ -111,28 +112,28 @@ data class FullAnimationSet(
             return animationSet.idle?.let { idle ->
                 // @formatter:off
                 FullAnimationSet(
-                    idle = AnimationItemInstance(idle),
-                    walk = AnimationItemInstance(animationSet.walk ?: idle),
-                    sprint = AnimationItemInstance(animationSet.sprint ?: animationSet.walk ?: idle),
-                    sneak = AnimationItemInstance(animationSet.sneak ?: animationSet.walk ?: idle),
-                    sneakIdle = AnimationItemInstance(animationSet.sneakIdle ?: idle),
-                    swingRight = AnimationItemInstance(animationSet.swingRight ?: animationSet.swingLeft ?: idle),
-                    swingLeft = AnimationItemInstance(animationSet.swingLeft ?: animationSet.swingRight ?: idle),
-                    elytraFly = AnimationItemInstance(animationSet.elytraFly ?: animationSet.swim ?: animationSet.walk ?: idle),
-                    swim = AnimationItemInstance(animationSet.swim ?: animationSet.walk ?: idle),
-                    onClimbable = AnimationItemInstance(animationSet.onClimbable ?: animationSet.onClimbableUp ?: animationSet.onClimbableDown ?: idle),
-                    onClimbableUp = AnimationItemInstance(animationSet.onClimbableUp ?: animationSet.onClimbableDown ?: animationSet.onClimbable ?: idle),
-                    onClimbableDown = AnimationItemInstance(animationSet.onClimbableDown ?: animationSet.onClimbableUp ?: animationSet.onClimbable ?: idle),
-                    sleep = AnimationItemInstance(animationSet.sleep ?: animationSet.lieDown ?: idle),
-                    ride = AnimationItemInstance(animationSet.ride ?: animationSet.onHorse ?: idle),
-                    die = AnimationItemInstance(animationSet.die ?: animationSet.lieDown ?: animationSet.sleep ?: idle),
-                    onHorse = AnimationItemInstance(animationSet.onHorse ?: animationSet.ride ?: idle),
-                    onPig = AnimationItemInstance(animationSet.onPig ?: animationSet.ride ?: idle),
-                    onBoat = AnimationItemInstance(animationSet.onBoat ?: animationSet.ride ?: idle),
-                    crawl = AnimationItemInstance(animationSet.crawl ?: animationSet.sneak ?: idle),
-                    crawlIdle = AnimationItemInstance(animationSet.crawlIdle ?: animationSet.crawl ?: animationSet.sleep ?: animationSet.sneak ?: idle),
-                    custom = animationSet.custom.mapValues { (_, value) -> AnimationItemInstance(value) },
-                    itemActive = animationSet.itemActive.mapValues { (_, value) -> AnimationItemInstance(value) },
+                    idle = AnimationItemInstanceFactory.of(idle),
+                    walk = AnimationItemInstanceFactory.of(animationSet.walk ?: idle),
+                    sprint = AnimationItemInstanceFactory.of(animationSet.sprint ?: animationSet.walk ?: idle),
+                    sneak = AnimationItemInstanceFactory.of(animationSet.sneak ?: animationSet.walk ?: idle),
+                    sneakIdle = AnimationItemInstanceFactory.of(animationSet.sneakIdle ?: idle),
+                    swingRight = AnimationItemInstanceFactory.of(animationSet.swingRight ?: animationSet.swingLeft ?: idle),
+                    swingLeft = AnimationItemInstanceFactory.of(animationSet.swingLeft ?: animationSet.swingRight ?: idle),
+                    elytraFly = AnimationItemInstanceFactory.of(animationSet.elytraFly ?: animationSet.swim ?: animationSet.walk ?: idle),
+                    swim = AnimationItemInstanceFactory.of(animationSet.swim ?: animationSet.walk ?: idle),
+                    onClimbable = AnimationItemInstanceFactory.of(animationSet.onClimbable ?: animationSet.onClimbableUp ?: animationSet.onClimbableDown ?: idle),
+                    onClimbableUp = AnimationItemInstanceFactory.of(animationSet.onClimbableUp ?: animationSet.onClimbableDown ?: animationSet.onClimbable ?: idle),
+                    onClimbableDown = AnimationItemInstanceFactory.of(animationSet.onClimbableDown ?: animationSet.onClimbableUp ?: animationSet.onClimbable ?: idle),
+                    sleep = AnimationItemInstanceFactory.of(animationSet.sleep ?: animationSet.lieDown ?: idle),
+                    ride = AnimationItemInstanceFactory.of(animationSet.ride ?: animationSet.onHorse ?: idle),
+                    die = AnimationItemInstanceFactory.of(animationSet.die ?: animationSet.lieDown ?: animationSet.sleep ?: idle),
+                    onHorse = AnimationItemInstanceFactory.of(animationSet.onHorse ?: animationSet.ride ?: idle),
+                    onPig = AnimationItemInstanceFactory.of(animationSet.onPig ?: animationSet.ride ?: idle),
+                    onBoat = AnimationItemInstanceFactory.of(animationSet.onBoat ?: animationSet.ride ?: idle),
+                    crawl = AnimationItemInstanceFactory.of(animationSet.crawl ?: animationSet.sneak ?: idle),
+                    crawlIdle = AnimationItemInstanceFactory.of(animationSet.crawlIdle ?: animationSet.crawl ?: animationSet.sleep ?: animationSet.sneak ?: idle),
+                    custom = animationSet.custom.mapValues { (_, value) -> AnimationItemInstanceFactory.of(value) },
+                    itemActive = animationSet.itemActive.mapValues { (_, value) -> AnimationItemInstanceFactory.of(value) },
                 )
                 // @formatter:on
             }
@@ -194,7 +195,7 @@ data object AnimationSetLoader {
                 fun load() = try {
                     val result = ModelFileLoaders.probeAndLoad(file, directory)
                     val animation = result?.animations?.firstOrNull() ?: return null
-                    AnimationLoader.load(scene, animation)
+                    AnimationItemFactory.load(scene, animation)
                 } catch (ex: Exception) {
                     logger.warn("Failed to load animation file: $file", ex)
                     null

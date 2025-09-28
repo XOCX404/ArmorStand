@@ -3,13 +3,13 @@ load("//rule:remap_jar.bzl", "remap_jar")
 alias(
     name = "render_fabric_unmapped",
     visibility = ["//visibility:public"],
-    actual = "//blazerod/render/src/fabric:fabric_unmapped",
+    actual = "//blazerod/render/fabric:fabric_unmapped",
 )
 
 alias(
     name = "render_fabric_unmapped_merged",
     visibility = ["//visibility:public"],
-    actual = "//blazerod/render/src/fabric:fabric_unmapped_merged",
+    actual = "//blazerod/render/fabric:fabric_unmapped_merged",
 )
 
 remap_jar(
@@ -26,19 +26,19 @@ remap_jar(
 alias(
     name = "render_main",
     visibility = ["//visibility:public"],
-    actual = "//blazerod/render/src/main",
+    actual = "//blazerod/render/main",
 )
 
 alias(
     name = "render_neoforge_unmapped",
     visibility = ["//visibility:public"],
-    actual = "//blazerod/render/src/neoforge:neoforge_unmapped",
+    actual = "//blazerod/render/neoforge:neoforge_unmapped",
 )
 
 alias(
     name = "render_neoforge_unmapped_merged",
     visibility = ["//visibility:public"],
-    actual = "//blazerod/render/src/neoforge:neoforge_unmapped_merged",
+    actual = "//blazerod/render/neoforge:neoforge_unmapped_merged",
 )
 
 remap_jar(
@@ -54,5 +54,5 @@ remap_jar(
 
 test_suite(
     name = "tests",
-    tests = ["//blazerod/render/src/test:standalone_tests"],
+    tests = ["//blazerod/render/test:standalone_tests"],
 )
